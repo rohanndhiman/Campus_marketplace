@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Campus Skill Marketplace{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Good to see you, {{ session.student_name.split()[0] }} 👋</h1>
+    <p>Here's what's happening on the marketplace today.</p>
+  </div>
+
+  <!-- ── Stats Row ── -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ open_requests }}</div>
+      <div class="stat-label">Open Requests</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ my_requests }}</div>
+      <div class="stat-label">My Posted Tasks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ my_tasks }}</div>
+      <div class="stat-label">Tasks Assigned to Me</div>
+    </div>
+  </div>
+
+  <!-- ── Recent Open Requests ── -->
+  <div class="card">
+    <div class="flex justify-between" style="margin-bottom:1rem; align-items:center;">
+      <h2 style="margin:0;">Recent Open Requests</h2>
+      <div class="flex gap-1">
+        <a href="{{ url_for('requests_list') }}" class="btn btn-outline btn-sm">View All</a>
+        <a href="{{ url_for('post_request') }}"  class="btn btn-primary btn-sm">+ Post Task</a>
+      </div>
+    </div>
+
+    {% if recent_requests %}
+    <table>
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Skill Needed</th>
+          <th>Posted By</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in recent_requests %}
+        <tr>
+          <td>
+            <strong>{{ req.title }}</strong>
+            <div class="text-muted" style="margin-top:2px;">{{ req.description[:70] }}{% if req.description|length > 70 %}...{% endif %}</div>
+          </td>
+          <td><span class="badge badge-skill">{{ req.skill_name }}</span></td>
+          <td>{{ req.poster_name }}</td>
+          <td class="text-muted">{{ req.created_at.strftime('%d %b') }}</td>
+          <td>
+            {% if req.posted_by != session.student_id %}
+            <form method="POST" action="{{ url_for('assign_task', request_id=req.request_id) }}" style="display:inline;">
+              <button class="btn btn-success btn-sm">Accept</button>
+            </form>
+            {% else %}
+            <span class="text-muted">Your post</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="icon">📋</div>
+      <p>No open requests yet. Be the first to <a href="{{ url_for('post_request') }}">post a task</a>!</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── Quick Links ── -->
+  <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1rem; margin-top:1.5rem;">
+    <a href="{{ url_for('students') }}" class="card" style="text-decoration:none; text-align:center;">
+      <div style="font-size:2rem; margin-bottom:0.5rem;">🔍</div>
+      <strong>Browse Students</strong>
+      <p class="text-muted mt-1">Find students with skills you need</p>
+    </a>
+    <a href="{{ url_for('my_tasks') }}" class="card" style="text-decoration:none; text-align:center;">
+      <div style="font-size:2rem; margin-bottom:0.5rem;">✅</div>
+      <strong>My Tasks</strong>
+      <p class="text-muted mt-1">Manage your assigned tasks</p>
+    </a>
+    <a href="{{ url_for('profile') }}" class="card" style="text-decoration:none; text-align:center;">
+      <div style="font-size:2rem; margin-bottom:0.5rem;">👤</div>
+      <strong>My Profile</strong>
+      <p class="text-muted mt-1">Update your skills and profile</p>
+    </a>
+  </div>
+
+</div>
+{% endblock %}

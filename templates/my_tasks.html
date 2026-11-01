@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block title %}My Tasks{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="page-header">
+    <h1>My Tasks</h1>
+    <p>Track tasks assigned to you and requests you've posted.</p>
+  </div>
+
+  <!-- ── SECTION 1: Tasks Assigned TO Me ── -->
+  <div class="section-title">Tasks Assigned to Me</div>
+
+  {% if assigned_tasks %}
+  <div class="card" style="margin-bottom:2rem;">
+    <table>
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Skill</th>
+          <th>Requested By</th>
+          <th>Status</th>
+          <th>Update Status</th>
+          <th>Feedback</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in assigned_tasks %}
+        <tr>
+          <td>
+            <strong>{{ task.title }}</strong>
+            <div class="text-muted" style="font-size:0.82rem; margin-top:2px;">
+              {{ task.description[:60] }}{% if task.description|length > 60 %}...{% endif %}
+            </div>
+          </td>
+
+          <td><span class="badge badge-skill">{{ task.skill_name }}</span></td>
+
+          <td>
+            <a href="{{ url_for('view_profile', student_id=task.posted_by if task.posted_by is defined else '#') }}">
+              {{ task.poster_name }}
+            </a>
+          </td>
+
+          <td>
+            {% if task.task_status == 'Pending' %}
+              <span class="badge badge-pending">Pending</span>
+            {% elif task.task_status == 'In Progress' %}
+              <span class="badge badge-in-progress">In Progress</span>
+            {% else %}
+              <span class="badge badge-completed">Completed</span>
+            {% endif %}
+          </td>
+
+          <!-- Status Update Dropdown -->
+          <td>
+            {% if task.task_status != 'Completed' %}
+            <form method="POST" action="{{ url_for('update_status', txn_id=task.txn_id) }}"
+                  class="flex gap-1">
+              <select name="status" style="font-size:0.82rem; padding:0.3rem 0.5rem;">
+                <option value="Pending"     {% if task.task_status=='Pending'     %}selected{% endif %}>Pending</option>
+                <option value="In Progress" {% if task.task_status=='In Progress' %}selected{% endif %}>In Progress</option>
+                <option value="Completed"   {% if task.task_status=='Completed'   %}selected{% endif %}>Completed</option>
+              </select>
+              <button type="submit" class="btn btn-primary btn-sm">Save</button>
+            </form>
+            {% else %}
+              <span class="text-muted">Done ✓</span>
+            {% endif %}
+          </td>
+
+          <!-- Feedback (only after task completed) -->
+          <td>
+            {% if task.task_status == 'Completed' %}
+              {% if task.my_feedback %}
+                <span class="stars" style="font-size:0.9rem;">★</span>
+                <strong>{{ task.my_feedback.rating }}</strong>
+                <span class="text-muted" style="font-size:0.78rem;">(given)</span>
+              {% else %}
+                <a href="{{ url_for('give_feedback', txn_id=task.txn_id) }}"
+                   class="btn btn-outline btn-sm">Rate</a>
+              {% endif %}
+            {% else %}
+              <span class="text-muted" style="font-size:0.82rem;">After completion</span>
+            {% endif %}
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="card empty-state" style="margin-bottom:2rem;">
+    <div class="icon">📭</div>
+    <p>No tasks assigned to you yet.
+      <a href="{{ url_for('requests_list') }}">Browse open requests</a> to get started.
+    </p>
+  </div>
+  {% endif %}
+
+
+  <!-- ── SECTION 2: Requests I Posted ── -->
+  <div class="section-title" style="margin-top:1rem;">Requests I Posted</div>
+
+  {% if posted_requests %}
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Task Title</th>
+          <th>Skill</th>
+          <th>Request Status</th>
+          <th>Assigned To</th>
+          <th>Task Progress</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in posted_requests %}
+        <tr>
+          <td><strong>{{ req.title }}</strong></td>
+          <td><span class="badge badge-skill">{{ req.skill_name }}</span></td>
+          <td>
+            {% if req.status == 'Open' %}
+              <span class="badge badge-open">Open</span>
+            {% elif req.status == 'Assigned' %}
+              <span class="badge badge-assigned">Assigned</span>
+            {% else %}
+              <span class="badge badge-completed">Completed</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if req.assignee_name %}
+              <a href="{{ url_for('view_profile', student_id=req.assigned_to if req.assigned_to is defined else '#') }}">
+                {{ req.assignee_name }}
+              </a>
+            {% else %}
+              <span class="text-muted">Not assigned yet</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if req.task_status %}
+              {% if req.task_status == 'Pending' %}
+                <span class="badge badge-pending">Pending</span>
+              {% elif req.task_status == 'In Progress' %}
+                <span class="badge badge-in-progress">In Progress</span>
+              {% else %}
+                <span class="badge badge-completed">Completed</span>
+              {% endif %}
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="card empty-state">
+    <div class="icon">📝</div>
+    <p>You haven't posted any requests yet.
+      <a href="{{ url_for('post_request') }}">Post one now!</a>
+    </p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

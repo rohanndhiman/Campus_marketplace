@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Post a Request{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:640px;">
+
+  <div class="page-header">
+    <h1>Post a Service Request</h1>
+    <p>Describe the task you need help with, and what skill is required.</p>
+  </div>
+
+  <div class="card">
+    <form method="POST" action="{{ url_for('post_request') }}">
+
+      <div class="form-group">
+        <label for="title">Task Title</label>
+        <input type="text" id="title" name="title" required
+               placeholder="e.g., Build a simple to-do app in Python" />
+      </div>
+
+      <div class="form-group">
+        <label for="skill_id">Skill Required</label>
+        <select id="skill_id" name="skill_id" required>
+          <option value="">Select the skill you need...</option>
+          {% for sk in all_skills %}
+          <option value="{{ sk.skill_id }}">{{ sk.skill_name }} — {{ sk.category }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Task Description</label>
+        <textarea id="description" name="description" rows="5" required
+                  placeholder="Describe what exactly needs to be done, deadline, deliverables, etc."></textarea>
+      </div>
+
+      <div class="flex gap-1">
+        <button type="submit" class="btn btn-primary">Post Request</button>
+        <a href="{{ url_for('requests_list') }}" class="btn btn-outline">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Tips box -->
+  <div class="card" style="margin-top:1rem; background:var(--accent-lt); border-color:var(--accent);">
+    <h2 style="font-size:1rem; margin-bottom:0.5rem;">💡 Tips for a good request</h2>
+    <ul style="padding-left:1.25rem; color:var(--muted); font-size:0.88rem; line-height:1.8;">
+      <li>Be specific about what you need done</li>
+      <li>Mention any deadline or time constraint</li>
+      <li>Describe expected output or deliverable</li>
+      <li>Keep the title short and clear</li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}

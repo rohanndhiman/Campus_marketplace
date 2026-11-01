@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Register — Campus Skill Marketplace{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card" style="max-width:520px;">
+
+    <h1>Create Account</h1>
+    <p>Join the campus skill sharing community.</p>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}" style="margin-bottom:1rem;">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Registration Form -->
+    <form method="POST" action="{{ url_for('register') }}">
+
+      <div class="two-col">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name"
+                 placeholder="Rohan Sharma" required />
+        </div>
+        <div class="form-group">
+          <label for="email">College Email</label>
+          <input type="email" id="email" name="email"
+                 placeholder="you@college.edu" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="Choose a strong password" required minlength="6" />
+      </div>
+
+      <div class="two-col">
+        <div class="form-group">
+          <label for="branch">Branch / Department</label>
+          <select id="branch" name="branch" required>
+            <option value="">Select branch</option>
+            <option>CSE</option>
+            <option>IT</option>
+            <option>ECE</option>
+            <option>EEE</option>
+            <option>Mechanical</option>
+            <option>Civil</option>
+            <option>MBA</option>
+            <option>Design</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="year">Year</label>
+          <select id="year" name="year" required>
+            <option value="">Select year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="bio">Short Bio <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+        <textarea id="bio" name="bio" rows="2"
+                  placeholder="Tell others a bit about yourself..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%;">
+        Register →
+      </button>
+    </form>
+
+    <hr />
+    <p style="text-align:center; font-size:0.88rem; color:var(--muted);">
+      Already have an account?
+      <a href="{{ url_for('login') }}">Login here</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

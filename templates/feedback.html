@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Give Feedback{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:560px;">
+
+  <div class="page-header">
+    <h1>Rate & Review</h1>
+    <p>Share your experience working with {{ txn.assignee_name }}.</p>
+  </div>
+
+  <div class="card">
+    <!-- Task Info Banner -->
+    <div style="background:var(--bg); border-radius:var(--radius); padding:1rem; margin-bottom:1.5rem;">
+      <div class="text-muted" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em;">Task</div>
+      <strong>{{ txn.title }}</strong>
+      <div class="text-muted mt-1">
+        Completed by <strong>{{ txn.assignee_name }}</strong>
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('give_feedback', txn_id=txn.txn_id) }}">
+
+      <!-- Star Rating -->
+      <div class="form-group">
+        <label>Rating</label>
+        <div class="rating-group">
+          {% for i in [1,2,3,4,5] %}
+          <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" required />
+          <label for="star{{ i }}" style="display:flex; align-items:center; gap:0.25rem;">
+            <span style="font-size:1.1rem;">★</span> {{ i }}
+          </label>
+          {% endfor %}
+        </div>
+        <div class="text-muted mt-1" style="font-size:0.8rem;">
+          1 = Poor &nbsp;·&nbsp; 5 = Excellent
+        </div>
+      </div>
+
+      <!-- Comment -->
+      <div class="form-group">
+        <label for="comment">Comment <span style="color:var(--muted); font-weight:400;">(optional)</span></label>
+        <textarea id="comment" name="comment" rows="4"
+                  placeholder="Describe your experience — quality, communication, timeliness..."></textarea>
+      </div>
+
+      <div class="flex gap-1">
+        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+        <a href="{{ url_for('my_tasks') }}" class="btn btn-outline">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}

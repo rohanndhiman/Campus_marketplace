@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Campus Skill Marketplace{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <!-- ── Navigation Bar ── -->
+  {% if session.student_id %}
+  <nav>
+    <a class="nav-brand" href="{{ url_for('dashboard') }}">
+      Campus <span>Skill</span> Marketplace
+    </a>
+    <div class="nav-links">
+      <a href="{{ url_for('dashboard') }}"    {% if request.endpoint=='dashboard'    %}class="active"{% endif %}>Dashboard</a>
+      <a href="{{ url_for('students') }}"     {% if request.endpoint=='students'     %}class="active"{% endif %}>Students</a>
+      <a href="{{ url_for('requests_list') }}"{% if request.endpoint=='requests_list'%}class="active"{% endif %}>Requests</a>
+      <a href="{{ url_for('my_tasks') }}"     {% if request.endpoint=='my_tasks'     %}class="active"{% endif %}>My Tasks</a>
+      <a href="{{ url_for('profile') }}"      {% if request.endpoint=='view_profile' %}class="active"{% endif %}>Profile</a>
+      {% if session.get('is_admin') %}
+      <a href="{{ url_for('verify_skills') }}"{% if request.endpoint=='verify_skills' %}class="active"{% endif %}>Admin</a>
+      {% endif %}
+      <a href="{{ url_for('logout') }}" style="color:#fca5a5;">Logout</a>
+    </div>
+  </nav>
+  {% endif %}
+
+  <!-- ── Flash Messages ── -->
+  <div class="container" style="padding-bottom:0; padding-top: {% if session.student_id %}1.25rem{% else %}0{% endif %};">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- ── Page Content ── -->
+  {% block content %}{% endblock %}
+
+</body>
+</html>

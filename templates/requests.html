@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Service Requests{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="page-header flex justify-between" style="align-items:flex-end;">
+    <div>
+      <h1>Service Requests</h1>
+      <p>Browse tasks posted by students, or post your own.</p>
+    </div>
+    <a href="{{ url_for('post_request') }}" class="btn btn-primary">+ Post Task</a>
+  </div>
+
+  {% if requests %}
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Skill Needed</th>
+          <th>Posted By</th>
+          <th>Status</th>
+          <th>Assigned To</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in requests %}
+        <tr>
+          <td>
+            <strong>{{ req.title }}</strong>
+            <div class="text-muted" style="margin-top:2px; font-size:0.82rem;">
+              {{ req.description[:80] }}{% if req.description|length > 80 %}...{% endif %}
+            </div>
+            <div class="text-muted" style="margin-top:2px; font-size:0.78rem;">
+              {{ req.created_at.strftime('%d %b %Y') }}
+            </div>
+          </td>
+
+          <td><span class="badge badge-skill">{{ req.skill_name }}</span></td>
+
+          <td>
+            <a href="{{ url_for('view_profile', student_id=req.posted_by) }}">
+              {{ req.poster_name }}
+            </a>
+          </td>
+
+          <td>
+            {% if req.status == 'Open' %}
+              <span class="badge badge-open">Open</span>
+            {% elif req.status == 'Assigned' %}
+              <span class="badge badge-assigned">Assigned</span>
+            {% else %}
+              <span class="badge badge-completed">Completed</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if req.transaction %}
+              <!-- Show assigned student's name -->
+              {% set txn = req.transaction %}
+              <span class="text-muted" style="font-size:0.85rem;">
+                Task #{{ txn.txn_id }}
+                <br>
+                <span class="badge badge-{{ txn.task_status|lower|replace(' ','-') }}">
+                  {{ txn.task_status }}
+                </span>
+              </span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if req.status == 'Open' and req.posted_by != session.student_id %}
+            <!-- Accept task button -->
+            <form method="POST" action="{{ url_for('assign_task', request_id=req.request_id) }}"
+                  onsubmit="return confirm('Accept this task?')">
+              <button type="submit" class="btn btn-success btn-sm">Accept</button>
+            </form>
+            {% elif req.posted_by == session.student_id %}
+              <span class="text-muted" style="font-size:0.82rem;">Your post</span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="empty-state card">
+    <div class="icon">📋</div>
+    <p>No requests yet. <a href="{{ url_for('post_request') }}">Post the first one!</a></p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

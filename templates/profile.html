@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block title %}{{ student.name }} — Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Profile Header -->
+  <div class="profile-header card" style="margin-bottom:1.5rem;">
+    <!-- Avatar shows first letter of name -->
+    <div class="avatar">{{ student.name[0].upper() }}</div>
+
+    <div class="profile-info" style="flex:1;">
+      <h2>{{ student.name }}</h2>
+      <div class="profile-meta">
+        {{ student.branch }} · Year {{ student.year }}
+        &nbsp;·&nbsp;
+        {{ student.email }}
+      </div>
+
+      <!-- Rating display -->
+      {% if rating_info and rating_info.avg_rating %}
+      <div class="flex gap-1 mt-1" style="align-items:center;">
+        <span class="stars">★</span>
+        <strong>{{ rating_info.avg_rating }}</strong>
+        <span class="text-muted">({{ rating_info.total_reviews }} review{% if rating_info.total_reviews != 1 %}s{% endif %})</span>
+      </div>
+      {% else %}
+      <div class="text-muted mt-1">No ratings yet</div>
+      {% endif %}
+
+      {% if student.bio %}
+      <p style="margin-top:0.75rem; color:var(--muted);">{{ student.bio }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Two Column Layout -->
+  <div class="two-col">
+
+    <!-- LEFT: Skills -->
+    <div class="card">
+      <h2>Skills</h2>
+
+      {% if skills %}
+      <table>
+        <thead>
+          <tr>
+            <th>Skill</th>
+            <th>Category</th>
+            <th>Status</th>
+            {% if is_own_profile %}<th>Remove</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for skill in skills %}
+          <tr>
+            <td><strong>{{ skill.skill_name }}</strong></td>
+            <td class="text-muted">{{ skill.category }}</td>
+            <td>
+              {% if skill.is_verified %}
+                <span class="badge badge-verified">✓ Verified</span>
+              {% else %}
+                <span class="badge badge-unverified">Unverified</span>
+              {% endif %}
+            </td>
+            {% if is_own_profile %}
+            <td>
+              <a href="{{ url_for('remove_skill', skill_id=skill.skill_id) }}"
+                 class="btn btn-danger btn-sm"
+                 onclick="return confirm('Remove this skill?')">✕</a>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <div class="icon">🎯</div>
+        <p>No skills added yet.</p>
+      </div>
+      {% endif %}
+
+      <!-- Add Skill form (only for own profile) -->
+      {% if is_own_profile %}
+      <hr />
+      <p class="section-title" style="border:none; padding:0; margin-bottom:0.75rem;">Add a Skill</p>
+      <form method="POST" action="{{ url_for('add_skill') }}" class="flex gap-1">
+        <select name="skill_id" required style="flex:1;">
+          <option value="">Select a skill...</option>
+          {% for sk in all_skills %}
+          <option value="{{ sk.skill_id }}">{{ sk.skill_name }} ({{ sk.category }})</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <!-- RIGHT: Profile Info -->
+    <div>
+      <!-- Student Details Card -->
+      <div class="card" style="margin-bottom:1rem;">
+        <h2>Details</h2>
+        <table>
+          <tr>
+            <td class="text-muted">Name</td>
+            <td><strong>{{ student.name }}</strong></td>
+          </tr>
+          <tr>
+            <td class="text-muted">Branch</td>
+            <td>{{ student.branch }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Year</td>
+            <td>Year {{ student.year }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Email</td>
+            <td>{{ student.email }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Joined</td>
+            <td>{{ student.created_at.strftime('%B %Y') }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Quick actions if viewing someone else's profile -->
+      {% if not is_own_profile %}
+      <div class="card">
+        <h2>Hire {{ student.name.split()[0] }}</h2>
+        <p class="text-muted" style="margin-bottom:1rem;">
+          Need this student's skills? Post a service request.
+        </p>
+        <a href="{{ url_for('post_request') }}" class="btn btn-primary" style="width:100%; text-align:center;">
+          Post a Request
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

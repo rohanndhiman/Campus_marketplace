@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Admin — Verify Skills{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="page-header">
+    <h1>Admin Panel — Skill Verification</h1>
+    <p>Toggle verification status for student skills.</p>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student</th>
+          <th>Skill</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in all_student_skills %}
+        <tr>
+          <td class="text-muted">{{ loop.index }}</td>
+          <td><strong>{{ entry.student_name }}</strong></td>
+          <td>{{ entry.skill_name }}</td>
+          <td>
+            {% if entry.is_verified %}
+              <span class="badge badge-verified">✓ Verified</span>
+            {% else %}
+              <span class="badge badge-unverified">Unverified</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('toggle_verify', ss_id=entry.id) }}"
+               class="btn btn-sm {% if entry.is_verified %}btn-danger{% else %}btn-success{% endif %}">
+              {% if entry.is_verified %}Unverify{% else %}Verify{% endif %}
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Explanation box for viva -->
+  <div class="card" style="margin-top:1.25rem; background:var(--warning-lt); border-color:var(--warning);">
+    <h2 style="font-size:1rem; margin-bottom:0.5rem;">ℹ️ How Verification Works</h2>
+    <p style="color:var(--muted); font-size:0.88rem;">
+      In a real system, admins would check credentials (certificates, project links) before marking a skill as verified.
+      Here, any logged-in user can toggle verification (for demo purposes).
+      Verified skills display a ✓ badge on the student's profile.
+    </p>
+  </div>
+
+</div>
+{% endblock %}

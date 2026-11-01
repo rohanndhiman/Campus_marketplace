@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Browse Students{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="page-header">
+    <h1>Browse Students</h1>
+    <p>Find students by their skills and hire them for your tasks.</p>
+  </div>
+
+  <!-- ── Search / Filter by Skill ── -->
+  <form method="GET" action="{{ url_for('students') }}" class="search-bar">
+    <select name="skill">
+      <option value="">All Skills</option>
+      {% for sk in all_skills %}
+      <option value="{{ sk.skill_name }}"
+        {% if sk.skill_name == skill_filter %}selected{% endif %}>
+        {{ sk.skill_name }}
+      </option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary">Search</button>
+    {% if skill_filter %}
+    <a href="{{ url_for('students') }}" class="btn btn-outline">Clear</a>
+    {% endif %}
+  </form>
+
+  {% if skill_filter %}
+  <p style="margin-bottom:1rem; color:var(--muted);">
+    Showing students with skill: <strong>{{ skill_filter }}</strong>
+    ({{ students|length }} result{% if students|length != 1 %}s{% endif %})
+  </p>
+  {% endif %}
+
+  <!-- ── Students Grid ── -->
+  {% if students %}
+  <div class="students-grid">
+    {% for student in students %}
+    <div class="student-card">
+
+      <!-- Avatar + Name -->
+      <div class="flex gap-1" style="margin-bottom:0.75rem; align-items:center;">
+        <div class="avatar" style="width:44px; height:44px; font-size:1.1rem;">
+          {{ student.name[0].upper() }}
+        </div>
+        <div>
+          <strong>{{ student.name }}</strong>
+          <div class="text-muted">{{ student.branch }} · Year {{ student.year }}</div>
+        </div>
+      </div>
+
+      <!-- Rating -->
+      {% if student.avg_rating %}
+      <div class="flex gap-1 mb-2" style="align-items:center; font-size:0.88rem;">
+        <span class="stars" style="font-size:0.9rem;">★</span>
+        <span><strong>{{ student.avg_rating }}</strong></span>
+      </div>
+      {% endif %}
+
+      <!-- Bio -->
+      {% if student.bio %}
+      <p class="text-muted" style="font-size:0.85rem; margin-bottom:0.75rem;">
+        {{ student.bio[:90] }}{% if student.bio|length > 90 %}...{% endif %}
+      </p>
+      {% endif %}
+
+      <!-- Skills -->
+      <div class="skills-wrap" style="margin-bottom:1rem;">
+        {% for skill in student.skills %}
+        <span class="badge badge-skill">
+          {{ skill.skill_name }}
+          {% if skill.is_verified %} ✓{% endif %}
+        </span>
+        {% endfor %}
+        {% if not student.skills %}
+        <span class="text-muted" style="font-size:0.82rem;">No skills listed</span>
+        {% endif %}
+      </div>
+
+      <!-- View Profile button -->
+      <a href="{{ url_for('view_profile', student_id=student.student_id) }}"
+         class="btn btn-outline btn-sm" style="width:100%; text-align:center;">
+        View Profile
+      </a>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="empty-state card">
+    <div class="icon">🔍</div>
+    <p>No students found{% if skill_filter %} with skill "{{ skill_filter }}"{% endif %}.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
