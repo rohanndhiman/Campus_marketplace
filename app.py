@@ -74,6 +74,18 @@ mysql = MySQLHelper(app)
 # HELPER FUNCTION
 # ============================================================
 
+@app.errorhandler(404)
+def page_not_found(e):
+    # If rewritten path was passed, attempt internal dispatch or debug
+    matched = request.environ.get('HTTP_X_MATCHED_PATH') or request.environ.get('REQUEST_URI')
+    return (
+        f"Debug 404: request.path='{request.path}', "
+        f"PATH_INFO='{request.environ.get('PATH_INFO')}', "
+        f"HTTP_X_MATCHED_PATH='{request.environ.get('HTTP_X_MATCHED_PATH')}', "
+        f"REQUEST_URI='{request.environ.get('REQUEST_URI')}'",
+        404
+    )
+
 def login_required(f):
     """Decorator to protect routes that need login."""
     from functools import wraps
