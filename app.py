@@ -7,26 +7,68 @@
 #   python app.py
 # ============================================================
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from flask_mysqldb import MySQL
+from flask import Flask, render_template, request, redirect, url_for, session, flash, g
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import pymysql
+import pymysql.cursors
 
 # ── App Setup ────────────────────────────────────────────────
-app = Flask(__name__)
+base_dir = os.path.abspath(os.path.dirname(__file__))
+app = Flask(
+    __name__,
+    template_folder=os.path.join(base_dir, 'templates'),
+    static_folder=os.path.join(base_dir, 'static')
+)
 
-# Secret key for session management (change in production)
-app.secret_key = 'campus_marketplace_secret_key_2024'
+# Secret key for session management (set SECRET_KEY in production)
+app.secret_key = os.environ.get('SECRET_KEY', 'campus_marketplace_secret_key_2024')
 
 # ── MySQL Configuration ──────────────────────────────────────
-# Edit these values to match your MySQL setup
-app.config['MYSQL_HOST']     = 'localhost'
-app.config['MYSQL_USER']     = 'root'
-app.config['MYSQL_PASSWORD'] = 'Rohan#8733'          # Your MySQL password
-app.config['MYSQL_DB']       = 'campus_marketplace'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'  # Return rows as dicts
+# Supports Environment Variables for Cloud Deployment (Vercel, Render, etc.)
+# and falls back to local configuration for offline development.
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', 'localhost')
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'root')
+app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD', 'Rohan#8733')
+app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB', 'campus_marketplace')
+app.config['MYSQL_PORT'] = int(os.environ.get('MYSQL_PORT', 3306))
+app.config['MYSQL_SSL'] = os.environ.get('MYSQL_SSL', 'false').lower() in ('true', '1', 'yes')
 
-mysql = MySQL(app)
+class MySQLHelper:
+    """Lightweight, serverless-friendly MySQL wrapper using PyMySQL."""
+    def __init__(self, app=None):
+        if app is not None:
+            self.init_app(app)
+
+    def init_app(self, app):
+        @app.teardown_appcontext
+        def close_db(error=None):
+            conn = g.pop('mysql_conn', None)
+            if conn is not None:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+
+    @property
+    def connection(self):
+        if 'mysql_conn' not in g:
+            kwargs = {
+                'host': app.config['MYSQL_HOST'],
+                'user': app.config['MYSQL_USER'],
+                'password': app.config['MYSQL_PASSWORD'],
+                'database': app.config['MYSQL_DB'],
+                'port': app.config['MYSQL_PORT'],
+                'cursorclass': pymysql.cursors.DictCursor,
+                'autocommit': False,
+                'charset': 'utf8mb4'
+            }
+            if app.config.get('MYSQL_SSL'):
+                kwargs['ssl'] = {'ssl_mode': 'REQUIRED'}
+            g.mysql_conn = pymysql.connect(**kwargs)
+        return g.mysql_conn
+
+mysql = MySQLHelper(app)
 
 # ============================================================
 # HELPER FUNCTION

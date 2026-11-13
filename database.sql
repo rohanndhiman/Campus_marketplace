@@ -112,13 +112,12 @@ INSERT INTO Skills (skill_name, category) VALUES
     ('Content Writing', 'Writing'),
     ('Photography',     'Media');
 
--- Insert Students (passwords are plain text here for demo; app uses hashing)
--- Password for all: password123
+-- Insert Students (Password for all: password123)
 INSERT INTO Students (name, email, password, branch, year, bio, is_admin) VALUES
-    ('Rohan Sharma',   'rohan@college.edu',   'pbkdf2:sha256:260000$demo$hash1', 'CSE', 3, 'I love coding and problem solving.', TRUE),
-    ('Priya Mehta',    'priya@college.edu',   'pbkdf2:sha256:260000$demo$hash2', 'Design', 2, 'Creative designer with 2 years experience.', FALSE),
-    ('Arjun Singh',    'arjun@college.edu',   'pbkdf2:sha256:260000$demo$hash3', 'ECE', 4, 'Final year student, expert in ML.', FALSE),
-    ('Neha Kapoor',    'neha@college.edu',    'pbkdf2:sha256:260000$demo$hash4', 'MBA', 1, 'Good at content writing and marketing.', FALSE);
+    ('Rohan Sharma',   'rohan@college.edu',   'scrypt:32768:8:1$Q8TRllEcSvDjO21i$1954472b73c79241a23abf267dd032541e887de0e8e2dad07b1a885eb3ce9d4abe094317ac544b53fc3feb63238399ae6c4efd342992fd7300845377f2c4eb7f', 'CSE', 3, 'I love coding and problem solving.', TRUE),
+    ('Priya Mehta',    'priya@college.edu',   'scrypt:32768:8:1$Q8TRllEcSvDjO21i$1954472b73c79241a23abf267dd032541e887de0e8e2dad07b1a885eb3ce9d4abe094317ac544b53fc3feb63238399ae6c4efd342992fd7300845377f2c4eb7f', 'Design', 2, 'Creative designer with 2 years experience.', FALSE),
+    ('Arjun Singh',    'arjun@college.edu',   'scrypt:32768:8:1$Q8TRllEcSvDjO21i$1954472b73c79241a23abf267dd032541e887de0e8e2dad07b1a885eb3ce9d4abe094317ac544b53fc3feb63238399ae6c4efd342992fd7300845377f2c4eb7f', 'ECE', 4, 'Final year student, expert in ML.', FALSE),
+    ('Neha Kapoor',    'neha@college.edu',    'scrypt:32768:8:1$Q8TRllEcSvDjO21i$1954472b73c79241a23abf267dd032541e887de0e8e2dad07b1a885eb3ce9d4abe094317ac544b53fc3feb63238399ae6c4efd342992fd7300845377f2c4eb7f', 'MBA', 1, 'Good at content writing and marketing.', FALSE);
 
 -- Assign Skills to Students
 INSERT INTO Student_Skills (student_id, skill_id, is_verified) VALUES
