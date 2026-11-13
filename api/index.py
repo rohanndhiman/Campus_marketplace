@@ -5,6 +5,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import app
+from flask import redirect, url_for
 
 class VercelPathMiddleware:
     """Fixes PATH_INFO when Vercel rewrites requests to /api/index."""
@@ -23,3 +24,7 @@ class VercelPathMiddleware:
         return self.wsgi_app(environ, start_response)
 
 app.wsgi_app = VercelPathMiddleware(app.wsgi_app)
+
+@app.route('/api/index')
+def vercel_api_index():
+    return redirect(url_for('index'))
